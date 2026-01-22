@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comparação de Temperaturas - Análise</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #333;
+            margin-bottom: 100px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .back-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .person-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .person-panel.left {
+            border-top: 4px solid #667eea;
+        }
+
+        .person-panel.right {
+            border-top: 4px solid #764ba2;
+        }
+
+        .person-selector {
+            margin-bottom: 25px;
+        }
+
+        .person-selector label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #718096;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .person-selector select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            color: #2d3748;
+            background-color: white;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            font-weight: 500;
+        }
+
+        .person-selector select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .person-info {
+            display: none;
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 2px solid #e2e8f0;
+        }
+
+        .person-info.active {
+            display: block;
+        }
+
+        .person-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .person-photo {
+            width: 70px;
+            height: 70px;
+            border-radius: 12px;
+            object-fit: cover;
+            border: 3px solid #e2e8f0;
+        }
+
+        .person-name-info h2 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 4px;
+        }
+
+        .temperatura-avg {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2d3748;
+            margin-top: 15px;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .detail-ruler {
+            margin-bottom: 12px;
+        }
+
+        .detail-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #718096;
+            text-transform: capitalize;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .detail-value {
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .ruler-container {
+            position: relative;
+            height: 22px;
+            margin-bottom: 2px;
+        }
+
+        .ruler-track {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            transform: translateY(-50%);
+        }
+
+        .ruler-fill {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+            transform: translateY(-50%);
+            transition: width 0.3s;
+        }
+
+        .ruler-dot {
+            position: absolute;
+            top: 50%;
+            width: 18px;
+            height: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .ruler-labels {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 2px;
+        }
+
+        .ruler-label {
+            font-size: 9px;
+            color: #cbd5e0;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #718096;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 1200px) {
+            .comparison-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="visualization.html" class="back-link">← Voltar para Visualização</a>
+            <h1>Comparação de Análise Detalhada</h1>
+        </div>
+
+        <div class="comparison-container">
+            <!-- Left Panel -->
+            <div class="person-panel left">
+                <div class="person-selector">
+                    <label for="person1Select">Selecione a Primeira Pessoa</label>
+                    <select id="person1Select" onchange="updatePerson(1)">
+                        <option value="">-- Selecione --</option>
+                    </select>
+                </div>
+                <div class="person-info" id="person1Info">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👤</div>
+                        <p>Selecione uma pessoa para comparar</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel -->
+            <div class="person-panel right">
+                <div class="person-selector">
+                    <label for="person2Select">Selecione a Segunda Pessoa</label>
+                    <select id="person2Select" onchange="updatePerson(2)">
+                        <option value="">-- Selecione --</option>
+                    </select>
+                </div>
+                <div class="person-info" id="person2Info">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👤</div>
+                        <p>Selecione uma pessoa para comparar</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let analysesData = [];
+        const detailsOrder = ['boca', 'iris', 'testa', 'queixo', 'bochecha', 'raiz_cabelo', 'sobrancelha', 'contorno_boca', 'cavidade_ocular'];
+
+        async function loadData() {
+            try {
+                const response = await fetch('analyses_data.json');
+                analysesData = await response.json();
+                populateSelects();
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+            }
+        }
+
+        function populateSelects() {
+            const select1 = document.getElementById('person1Select');
+            const select2 = document.getElementById('person2Select');
+
+            analysesData.forEach((person, index) => {
+                const option1 = document.createElement('option');
+                option1.value = index;
+                option1.textContent = person.name;
+                select1.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = index;
+                option2.textContent = person.name;
+                select2.appendChild(option2);
+            });
+        }
+
+        function updatePerson(panelNumber) {
+            const selectId = `person${panelNumber}Select`;
+            const infoId = `person${panelNumber}Info`;
+            const selectElement = document.getElementById(selectId);
+            const infoElement = document.getElementById(infoId);
+
+            const selectedIndex = selectElement.value;
+
+            if (!selectedIndex) {
+                infoElement.classList.remove('active');
+                infoElement.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">👤</div>
+                        <p>Selecione uma pessoa para comparar</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const person = analysesData[selectedIndex];
+            const temperatureDetails = person.temperatura_details || {};
+
+            let html = `
+                <div class="person-header">
+                    <img src="${person.face_photo_url}" alt="${person.name}" class="person-photo">
+                    <div class="person-name-info">
+                        <h2>${person.name}</h2>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <span class="temperatura-avg">Temp Média: ${person.temperatura_avg.toFixed(2)}</span>
+                            <span class="temperatura-avg">${person.temperatura_mascara}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-title">Temperatura Detalhes</div>
+            `;
+
+            detailsOrder.forEach(detail => {
+                const value = temperatureDetails[detail] !== undefined ? temperatureDetails[detail] : 0;
+                const percentage = (value / 100) * 100;
+
+                html += `
+                    <div class="detail-ruler">
+                        <div class="detail-label">
+                            <span>${detail}</span>
+                            <span class="detail-value">${value.toFixed(2)}</span>
+                        </div>
+                        <div class="ruler-container">
+                            <div class="ruler-track">
+                                <div class="ruler-fill" style="width: ${percentage}%"></div>
+                                <div class="ruler-dot" style="left: ${percentage}%"></div>
+                            </div>
+                        </div>
+                        <div class="ruler-labels">
+                            <span class="ruler-label">0</span>
+                            <span class="ruler-label">50</span>
+                            <span class="ruler-label">100</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            infoElement.innerHTML = html;
+            infoElement.classList.add('active');
+        }
+
+        // Load data on page load
+        loadData();
+    </script>
+</body>
+</html>

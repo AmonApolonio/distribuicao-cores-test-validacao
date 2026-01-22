@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Distribuição de Temperatura - Análise</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #333;
+            margin-bottom: 100px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .back-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        .ruler-section {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .ruler-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 15px;
+            text-transform: capitalize;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .inline-legend {
+            display: flex;
+            gap: 15px;
+            margin-left: auto;
+        }
+
+        .inline-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .inline-legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .inline-legend-label {
+            font-size: 12px;
+            color: #718096;
+            font-weight: 400;
+        }
+
+        .ruler-controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .control-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .control-group label {
+            font-size: 12px;
+            color: #718096;
+            font-weight: 500;
+            min-width: 30px;
+        }
+
+        .control-group input {
+            width: 70px;
+            padding: 6px 10px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 12px;
+            color: #2d3748;
+        }
+
+        .control-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .ruler-container {
+            position: relative;
+            height: 80px;
+            margin-bottom: 12px;
+        }
+
+        .ruler-track {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            transform: translateY(-50%);
+        }
+
+        .ruler-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            padding: 0 8px;
+        }
+
+        .ruler-label {
+            font-size: 11px;
+            color: #718096;
+            font-weight: 500;
+        }
+
+        .data-point {
+            position: absolute;
+            top: 50%;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            border: 3px solid white;
+        }
+
+        .data-point:hover {
+            width: 22px;
+            height: 22px;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            pointer-events: none;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            max-width: 300px;
+        }
+
+        .tooltip.visible {
+            opacity: 1;
+        }
+
+        .tooltip-image {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tooltip-content {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .tooltip-name {
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .tooltip-value {
+            font-size: 11px;
+            color: #cbd5e0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Distribuição de Temperatura - Detalhes</h1>
+            <a href="visualization.html" class="back-btn">← Voltar para Visualização</a>
+        </div>
+
+        <div id="distributionContainer"></div>
+    </div>
+
+    <div class="tooltip" id="tooltip">
+        <img class="tooltip-image" id="tooltipImage" src="" alt="">
+        <div class="tooltip-content">
+            <div class="tooltip-name" id="tooltipName"></div>
+            <div class="tooltip-value" id="tooltipValue"></div>
+        </div>
+    </div>
+
+    <script>
+        let analysesData = [];
+        const detailsOrder = ['boca', 'iris', 'testa', 'queixo', 'bochecha', 'raiz_cabelo', 'sobrancelha', 'contorno_boca', 'cavidade_ocular'];
+        
+        const ranges = {};
+        detailsOrder.forEach(detail => {
+            ranges[detail] = { min: 0, max: 100 };
+        });
+
+        async function loadData() {
+            try {
+                const response = await fetch('analyses_data.json');
+                analysesData = await response.json();
+                renderDistributions();
+            } catch (error) {
+                console.error('Erro ao carregar dados:', error);
+            }
+        }
+
+        function renderDistributions() {
+            const container = document.getElementById('distributionContainer');
+            container.innerHTML = '';
+
+            detailsOrder.forEach(detail => {
+                const section = document.createElement('div');
+                section.className = 'ruler-section';
+
+                let html = `
+                    <div class="ruler-title">
+                        <span>${detail}</span>
+                        <div class="inline-legend">
+                            <div class="inline-legend-item">
+                                <div class="inline-legend-color" style="background-color: #E60000;"></div>
+                                <div class="inline-legend-label">Quente</div>
+                            </div>
+                            <div class="inline-legend-item">
+                                <div class="inline-legend-color" style="background-color: #1700E6;"></div>
+                                <div class="inline-legend-label">Frio</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="ruler-controls">
+                        <div class="control-group">
+                            <label>Min:</label>
+                            <input type="number" id="${detail}Min" value="0" onchange="updateRulerRange('${detail}')">
+                        </div>
+                        <div class="control-group">
+                            <label>Max:</label>
+                            <input type="number" id="${detail}Max" value="100" onchange="updateRulerRange('${detail}')">
+                        </div>
+                    </div>
+                    <div class="ruler-container" id="${detail}Ruler"></div>
+                    <div class="ruler-labels" id="${detail}Labels">
+                        <span class="ruler-label">0</span>
+                        <span class="ruler-label">25</span>
+                        <span class="ruler-label">50</span>
+                        <span class="ruler-label">75</span>
+                        <span class="ruler-label">100</span>
+                    </div>
+                `;
+
+                section.innerHTML = html;
+                container.appendChild(section);
+
+                renderRuler(detail);
+            });
+        }
+
+        function updateRulerRange(detail) {
+            const minInput = document.getElementById(`${detail}Min`);
+            const maxInput = document.getElementById(`${detail}Max`);
+            
+            ranges[detail].min = parseFloat(minInput.value) || 0;
+            ranges[detail].max = parseFloat(maxInput.value) || 100;
+            
+            if (ranges[detail].min >= ranges[detail].max) {
+                ranges[detail].max = ranges[detail].min + 1;
+                maxInput.value = ranges[detail].max;
+            }
+            
+            updateLabels(detail);
+            renderRuler(detail);
+        }
+
+        function updateLabels(detail) {
+            const labelsElement = document.getElementById(`${detail}Labels`);
+            const min = ranges[detail].min;
+            const max = ranges[detail].max;
+            const range = max - min;
+            
+            const labels = [
+                min,
+                min + range * 0.25,
+                min + range * 0.5,
+                min + range * 0.75,
+                max
+            ];
+            
+            labelsElement.innerHTML = labels.map(label => 
+                `<span class="ruler-label">${label.toFixed(1)}</span>`
+            ).join('');
+        }
+
+        function renderRuler(detail) {
+            const container = document.getElementById(`${detail}Ruler`);
+            
+            // Clear existing dots
+            const existingDots = container.querySelectorAll('.data-point');
+            existingDots.forEach(dot => dot.remove());
+
+            // Add track if not exists
+            if (!container.querySelector('.ruler-track')) {
+                const track = document.createElement('div');
+                track.className = 'ruler-track';
+                container.appendChild(track);
+            }
+
+            // Add data points
+            analysesData.forEach((person, index) => {
+                const temperatureDetails = person.temperatura_details || {};
+                const value = temperatureDetails[detail] !== undefined ? temperatureDetails[detail] : 0;
+
+                if (value !== null && value !== undefined) {
+                    const dot = document.createElement('div');
+                    dot.className = 'data-point';
+                    
+                    // Position based on custom range
+                    const min = ranges[detail].min;
+                    const max = ranges[detail].max;
+                    const position = Math.max(0, Math.min(100, ((value - min) / (max - min)) * 100));
+                    dot.style.left = `${position}%`;
+                    
+                    // Color based on temperatura_mascara
+                    const color = person.temperatura_mascara === 'quente' ? '#E60000' : '#1700E6';
+                    dot.style.backgroundColor = color;
+                    
+                    // Add hover effect
+                    dot.addEventListener('mouseenter', (e) => showTooltip(e, person, detail, value));
+                    dot.addEventListener('mouseleave', hideTooltip);
+                    
+                    container.appendChild(dot);
+                }
+            });
+        }
+
+        function showTooltip(event, person, detail, value) {
+            const tooltip = document.getElementById('tooltip');
+            const tooltipImage = document.getElementById('tooltipImage');
+            const tooltipName = document.getElementById('tooltipName');
+            const tooltipValue = document.getElementById('tooltipValue');
+            
+            tooltipImage.src = person.face_photo_url || '';
+            tooltipImage.alt = person.name || 'Sem nome';
+            tooltipName.textContent = person.name || 'Sem nome';
+            tooltipValue.textContent = `${detail}: ${value.toFixed(2)} (${person.temperatura_mascara})`;
+            
+            tooltip.style.left = `${event.pageX + 15}px`;
+            tooltip.style.top = `${event.pageY - 10}px`;
+            tooltip.classList.add('visible');
+        }
+
+        function hideTooltip() {
+            const tooltip = document.getElementById('tooltip');
+            tooltip.classList.remove('visible');
+        }
+
+        // Load data on page load
+        loadData();
+    </script>
+</body>
+</html>
