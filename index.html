@@ -586,7 +586,7 @@
             tooltipImage.src = item.face_photo_url || '';
             tooltipImage.alt = item.name || 'Sem nome';
             tooltipName.textContent = item.name || 'Sem nome';
-            tooltipValue.textContent = `${valueKey.replace('_avg', '')}: ${value?.toFixed(2) || 'N/A'} | ${colorKey.replace('_mascara', '')}: ${item[colorKey]} [${isAcerto ? 'Acerto' : 'Erro'}]`;
+            tooltipValue.textContent = `${valueKey.replace('_avg', '')}: ${value?.toFixed(2) || 'N/A'} | ${colorKey.replace('_mascara', '')}: ${item[colorKey]}`;
             tooltipSeason.textContent = `Estação (F): ${item.colorSeason_mascara}`;
             tooltipSeason2.textContent = `Estação (AI): ${item.colorSeason}`;
             
