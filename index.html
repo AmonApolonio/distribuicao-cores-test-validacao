@@ -272,7 +272,7 @@
         <div class="ruler-section">
             <div class="ruler-title">
                 <span>Temperatura</span>
-                <div style="display: flex; gap: 15px; margin-left: auto;">
+                <div style="display: flex; gap: 15px; margin-left: auto; align-items: center;">
                     <div class="inline-legend">
                         <div class="inline-legend-item">
                             <div class="inline-legend-color" style="background-color: #E60000;"></div>
@@ -282,6 +282,16 @@
                             <div class="inline-legend-color" style="background-color: #1700E6;"></div>
                             <div class="inline-legend-label">Frio</div>
                         </div>
+                    </div>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #718096; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" id="acertosFilter" checked onchange="updateRulerRange('temperatura')">
+                            Acertos
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #718096; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" id="errosFilter" checked onchange="updateRulerRange('temperatura')">
+                            Erros
+                        </label>
                     </div>
                     <a href="temperatura-distribution.html" style="text-decoration: none;">
                         <button style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);">
@@ -313,14 +323,26 @@
         <div class="ruler-section">
             <div class="ruler-title">
                 <span>Intensidade</span>
-                <div class="inline-legend">
-                    <div class="inline-legend-item">
-                        <div class="inline-legend-color" style="background-color: #FF4D00;"></div>
-                        <div class="inline-legend-label">Brilhante</div>
+                <div style="display: flex; gap: 15px; margin-left: auto; align-items: center;">
+                    <div class="inline-legend">
+                        <div class="inline-legend-item">
+                            <div class="inline-legend-color" style="background-color: #FF4D00;"></div>
+                            <div class="inline-legend-label">Brilhante</div>
+                        </div>
+                        <div class="inline-legend-item">
+                            <div class="inline-legend-color" style="background-color: #FFD1BD;"></div>
+                            <div class="inline-legend-label">Suave</div>
+                        </div>
                     </div>
-                    <div class="inline-legend-item">
-                        <div class="inline-legend-color" style="background-color: #FFD1BD;"></div>
-                        <div class="inline-legend-label">Suave</div>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #718096; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" id="acertosFilterIntensidade" checked onchange="updateRulerRange('intensidade')">
+                            Acertos
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #718096; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" id="errosFilterIntensidade" checked onchange="updateRulerRange('intensidade')">
+                            Erros
+                        </label>
                     </div>
                 </div>
             </div>
@@ -347,14 +369,26 @@
         <div class="ruler-section">
             <div class="ruler-title">
                 <span>Profundidade</span>
-                <div class="inline-legend">
-                    <div class="inline-legend-item">
-                        <div class="inline-legend-color" style="background-color: #2D2D2D;"></div>
-                        <div class="inline-legend-label">Escuro</div>
+                <div style="display: flex; gap: 15px; margin-left: auto; align-items: center;">
+                    <div class="inline-legend">
+                        <div class="inline-legend-item">
+                            <div class="inline-legend-color" style="background-color: #2D2D2D;"></div>
+                            <div class="inline-legend-label">Escuro</div>
+                        </div>
+                        <div class="inline-legend-item">
+                            <div class="inline-legend-color" style="background-color: #BDBDBD;"></div>
+                            <div class="inline-legend-label">Claro</div>
+                        </div>
                     </div>
-                    <div class="inline-legend-item">
-                        <div class="inline-legend-color" style="background-color: #BDBDBD;"></div>
-                        <div class="inline-legend-label">Claro</div>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #718096; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" id="acertosFilterProfundidade" checked onchange="updateRulerRange('profundidade')">
+                            Acertos
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; color: #718096; font-weight: 500; cursor: pointer;">
+                            <input type="checkbox" id="errosFilterProfundidade" checked onchange="updateRulerRange('profundidade')">
+                            Erros
+                        </label>
                     </div>
                 </div>
             </div>
@@ -482,12 +516,43 @@
                 container.appendChild(track);
             }
 
+            // Get filter states based on ruler type
+            let showAcertos, showErros;
+            if (rulerType === 'temperatura') {
+                showAcertos = document.getElementById('acertosFilter')?.checked ?? true;
+                showErros = document.getElementById('errosFilter')?.checked ?? true;
+            } else if (rulerType === 'intensidade') {
+                showAcertos = document.getElementById('acertosFilterIntensidade')?.checked ?? true;
+                showErros = document.getElementById('errosFilterIntensidade')?.checked ?? true;
+            } else if (rulerType === 'profundidade') {
+                showAcertos = document.getElementById('acertosFilterProfundidade')?.checked ?? true;
+                showErros = document.getElementById('errosFilterProfundidade')?.checked ?? true;
+            }
+
             // Add data points
             analysesData.forEach((item, index) => {
                 const value = item[valueKey];
                 const colorValue = item[colorKey];
                 
                 if (value !== null && value !== undefined && colorValue) {
+                    // Check if this is an "Acerto" or "Erro" based on ruler type
+                    let isAcerto;
+                    if (rulerType === 'temperatura') {
+                        isAcerto = (colorValue.toLowerCase() === 'quente' && value > 50) || 
+                                   (colorValue.toLowerCase() === 'frio' && value < 50);
+                    } else if (rulerType === 'intensidade') {
+                        isAcerto = (colorValue.toLowerCase() === 'brilhante' && value > 50) || 
+                                   (colorValue.toLowerCase() === 'suave' && value < 50);
+                    } else if (rulerType === 'profundidade') {
+                        isAcerto = (colorValue.toLowerCase() === 'claro' && value > 50) || 
+                                   (colorValue.toLowerCase() === 'escuro' && value < 50);
+                    }
+                    
+                    // Apply filter
+                    if ((isAcerto && !showAcertos) || (!isAcerto && !showErros)) {
+                        return; // Skip this item
+                    }
+
                     const dot = document.createElement('div');
                     dot.className = 'data-point';
                     
@@ -502,7 +567,7 @@
                     dot.style.backgroundColor = color || '#999';
                     
                     // Add hover effect
-                    dot.addEventListener('mouseenter', (e) => showTooltip(e, item, valueKey, colorKey, value));
+                    dot.addEventListener('mouseenter', (e) => showTooltip(e, item, valueKey, colorKey, value, isAcerto));
                     dot.addEventListener('mouseleave', hideTooltip);
                     
                     container.appendChild(dot);
@@ -510,7 +575,7 @@
             });
         }
 
-        function showTooltip(event, item, valueKey, colorKey, value) {
+        function showTooltip(event, item, valueKey, colorKey, value, isAcerto) {
             const tooltip = document.getElementById('tooltip');
             const tooltipImage = document.getElementById('tooltipImage');
             const tooltipName = document.getElementById('tooltipName');
@@ -521,7 +586,7 @@
             tooltipImage.src = item.face_photo_url || '';
             tooltipImage.alt = item.name || 'Sem nome';
             tooltipName.textContent = item.name || 'Sem nome';
-            tooltipValue.textContent = `${valueKey.replace('_avg', '')}: ${value?.toFixed(2) || 'N/A'} | ${colorKey.replace('_mascara', '')}: ${item[colorKey]}`;
+            tooltipValue.textContent = `${valueKey.replace('_avg', '')}: ${value?.toFixed(2) || 'N/A'} | ${colorKey.replace('_mascara', '')}: ${item[colorKey]} [${isAcerto ? 'Acerto' : 'Erro'}]`;
             tooltipSeason.textContent = `Estação (F): ${item.colorSeason_mascara}`;
             tooltipSeason2.textContent = `Estação (AI): ${item.colorSeason}`;
             
